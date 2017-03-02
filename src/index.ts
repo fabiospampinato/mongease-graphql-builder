@@ -40,6 +40,11 @@ const Builder = {
   mutation ( name: string, string = false ) {
 
     return Builder.make ( 'mutation', name, string );
+  },
+
+  subscription ( resolver: string, string = false ) {
+
+    return Builder.make ( 'subscription', resolver, string );
 
   },
 

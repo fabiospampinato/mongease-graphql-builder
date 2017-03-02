@@ -50,6 +50,10 @@ Creates and returns a GraphQL query, given the name of the resolver.
 
 Creates and returns a GraphQL mutation, given the name of the resolver.
 
+### `.subscription ( resolver: string, string = false )`
+
+Creates and returns a GraphQL subscription, given the name of the resolver.
+
 ## Related
 
 - [mongoose-to-graphql](https://github.com/fabiospampinato/mongoose-to-graphql) - Converts a Mongoose schema to its GraphQL representation.
