@@ -69,7 +69,7 @@ const Builder = {
 
   _toGQL ( string ) {
 
-    return gql ( string );
+    return gql`${string}`;
 
   },
 
