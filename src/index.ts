@@ -103,7 +103,7 @@ const Builder = {
 
       return Builder._expandType ( Mongease.getSchema ( type.modelName ) );
 
-    } else if ( type instanceof Mongoose.Schema ) {
+    } else if ( _.isObject ( type ) && 'childSchemas' in type && 'obj' in type ) { // Is a Mongoose's Schema
 
       return Builder._expandType ( type.obj );
 
