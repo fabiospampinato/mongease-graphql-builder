@@ -3,9 +3,7 @@
 
 import * as _ from 'lodash';
 import gql from 'graphql-tag';
-import Mongoose from 'mongoose';
 import Mongease from 'mongease';
-import MongeaseGraphQL from 'mongease-graphql';
 
 /* MONGEASE GRAPHQL BUILDER */
 
@@ -16,30 +14,31 @@ const Builder = {
 
   /* MAKE */
 
-  make ( what: 'query' | 'mutation' | 'subscription', name: string, string = false ) {
+  make ( what: 'query' | 'mutation' | 'subscription', resolver: string, string = false ) {
 
     const What = _.upperFirst ( what ),
-          item = _.find ( MongeaseGraphQL._parsed, `resolvers.${What}.${name}` );
+          item = _.find ( Mongease._parsed, `config.resolvers.${What}.${resolver}` );
 
     if ( _.isUndefined ( item ) ) throw new Error ( '[mongease-graphql-builder] Missing resolver, did you forget to add the MongeaseGraphQL plugin?' );
 
     const type = item['model'].modelName,
-          resolver = item['data'].resolvers[What][name],
-          str = Builder._toString ( what, type, name, resolver );
+          data = item['config'].resolvers[What][resolver],
+          str = Builder._toString ( what, type, resolver, data );
 
     return string ? str : Builder._toGQL ( str );
 
   },
 
-  query ( name: string, string = false ) {
+  query ( resolver: string, string = false ) {
 
-    return Builder.make ( 'query', name, string );
+    return Builder.make ( 'query', resolver, string );
 
   },
 
-  mutation ( name: string, string = false ) {
+  mutation ( resolver: string, string = false ) {
 
-    return Builder.make ( 'mutation', name, string );
+    return Builder.make ( 'mutation', resolver, string );
+
   },
 
   subscription ( resolver: string, string = false ) {
@@ -50,18 +49,18 @@ const Builder = {
 
   /* UTILITIES */
 
-  _toString ( what: string, type: string, name: string, resolver ): string { //TODO: We should probably do some memoization here
+  _toString ( what: string, type: string, resolver: string, data ): string { //TODO: We should probably do some memoization here
 
-    const wrapperArgs = _.reduce ( resolver.args, ( acc, type, name ) => acc.concat ([ `$${name}: ${type}` ]), [] as string[] ),
-          wrapperCall = wrapperArgs.length ? `( ${wrapperArgs.join ( ', ' )} )` : '()',
-          resolverArgs = _.reduce ( resolver.args, ( acc, type, name ) => acc.concat ([ `${name}: $${name}` ]), [] as string[] ),
-          resolverCall = resolverArgs.length ? `( ${resolverArgs.join ( ', ' )} )` : '()',
+    const wrapperArgs = _.reduce ( data.args, ( acc, type, name ) => acc.concat ([ `$${name}: ${type}` ]), [] as string[] ),
+          wrapperCall = wrapperArgs.length ? `( ${wrapperArgs.join ( ', ' )} )` : '',
+          resolverArgs = _.reduce ( data.args, ( acc, type, name ) => acc.concat ([ `${name}: $${name}` ]), [] as string[] ),
+          resolverCall = resolverArgs.length ? `( ${resolverArgs.join ( ', ' )} )` : '',
           prop = _.lowerFirst ( type ),
-          fields = Builder._getFields ( Builder._expandType ( resolver.type || type ) );
+          fields = Builder._getFields ( Builder._expandType ( data.type || type ) );
 
     return `
       ${what} ${wrapperCall} {
-        ${prop}: ${name} ${resolverCall} ${fields}
+        ${prop}: ${resolver} ${resolverCall} ${fields}
       }
     `;
 
