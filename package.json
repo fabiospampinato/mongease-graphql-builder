@@ -47,8 +47,7 @@
     "graphql-tag": "^1.2.4",
     "lodash": "^4.17.4",
     "mongease": "^1.0.1",
-    "mongease-graphql": "^1.0.0",
-    "mongoose": "^4.8.4"
+    "mongease-graphql": "^1.0.0"
   },
   "devDependencies": {
     "ava": "^0.18.2",
