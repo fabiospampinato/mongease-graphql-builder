@@ -91,7 +91,11 @@ const Builder = {
 
       } else {
 
-        _.forOwn ( type, ( val, key: string ) => type[key] = Builder._expandType ( val ) );
+        return _.transform ( type, ( acc, val, key: string ) => {
+
+          acc[key] = Builder._expandType ( val );
+
+        }, {} );
 
       }
 
