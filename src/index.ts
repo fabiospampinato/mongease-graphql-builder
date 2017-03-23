@@ -59,7 +59,7 @@ const Builder = {
           fields = Builder._getFields ( Builder._expandType ( data.type || type ) );
 
     return `
-      ${what} ${wrapperCall} {
+      ${what} ${resolver} ${wrapperCall} {
         ${prop}: ${resolver} ${resolverCall} ${fields}
       }
     `;
