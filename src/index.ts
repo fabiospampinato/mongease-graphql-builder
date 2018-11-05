@@ -134,4 +134,4 @@ const Builder = {
 
 /* EXPORT */
 
-export default Builder;
+export = Object.assign ( Builder, { default: Builder } );
