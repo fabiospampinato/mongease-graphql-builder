@@ -1,7 +1,18 @@
 
 /* IMPORT */
 
-import * as _ from 'lodash';
+import find = require ( 'lodash/find' );
+import forEach = require ( 'lodash/forEach' );
+import isArray = require ( 'lodash/isArray' );
+import isFunction = require ( 'lodash/isFunction' );
+import isObject = require ( 'lodash/isObject' );
+import isPlainObject = require ( 'lodash/isPlainObject' );
+import isString = require ( 'lodash/isString' );
+import isUndefined = require ( 'lodash/isUndefined' );
+import lowerFirst = require ( 'lodash/lowerFirst' );
+import reduce = require ( 'lodash/reduce' );
+import transform = require ( 'lodash/transform' );
+import upperFirst = require ( 'lodash/upperFirst' );
 import gql from 'graphql-tag';
 import Mongease from 'mongease';
 
@@ -16,10 +27,10 @@ const Builder = {
 
   make ( what: 'query' | 'mutation' | 'subscription', resolver: string, string = false ) {
 
-    const What = _.upperFirst ( what ),
-          item = _.find ( Mongease._parsed, `config.resolvers.${What}.${resolver}` );
+    const What = upperFirst ( what ),
+          item = find ( Mongease._parsed, `config.resolvers.${What}.${resolver}` );
 
-    if ( _.isUndefined ( item ) ) throw new Error ( '[mongease-graphql-builder] Missing resolver, did you forget to add the MongeaseGraphQL plugin?' );
+    if ( isUndefined ( item ) ) throw new Error ( '[mongease-graphql-builder] Missing resolver, did you forget to add the MongeaseGraphQL plugin?' );
 
     const type = item['model'].modelName,
           data = item['config'].resolvers[What][resolver],
@@ -51,11 +62,11 @@ const Builder = {
 
   _toString ( what: string, type: string, resolver: string, data ): string { //TODO: We should probably do some memoization here
 
-    const wrapperArgs = _.reduce ( data.args, ( acc, type, name ) => acc.concat ([ `$${name}: ${type}` ]), [] as string[] ),
+    const wrapperArgs = reduce ( data.args, ( acc, type, name ) => acc.concat ([ `$${name}: ${type}` ]), [] as string[] ),
           wrapperCall = wrapperArgs.length ? `( ${wrapperArgs.join ( ', ' )} )` : '',
-          resolverArgs = _.reduce ( data.args, ( acc, type, name ) => acc.concat ([ `${name}: $${name}` ]), [] as string[] ),
+          resolverArgs = reduce ( data.args, ( acc, type, name ) => acc.concat ([ `${name}: $${name}` ]), [] as string[] ),
           resolverCall = resolverArgs.length ? `( ${resolverArgs.join ( ', ' )} )` : '',
-          prop = _.lowerFirst ( type ),
+          prop = lowerFirst ( type ),
           fields = Builder._getFields ( Builder._expandType ( data.type || type ) );
 
     return `
@@ -74,15 +85,15 @@ const Builder = {
 
   _expandType ( type ) { //TODO: Maybe create a module out of it
 
-    if ( _.isString ( type ) ) {
+    if ( isString ( type ) ) {
 
       return Builder._expandType ( Mongease.getSchema ( type ) );
 
-    } else if ( _.isArray ( type ) ) {
+    } else if ( isArray ( type ) ) {
 
       if ( type.length ) return [Builder._expandType ( type[0] )];
 
-    } else if ( _.isPlainObject ( type ) ) {
+    } else if ( isPlainObject ( type ) ) {
 
       if ( type.hasOwnProperty ( 'type' ) ) {
 
@@ -90,7 +101,7 @@ const Builder = {
 
       } else {
 
-        return _.transform ( type, ( acc, val, key: string ) => {
+        return transform ( type, ( acc, val, key: string ) => {
 
           acc[key] = Builder._expandType ( val );
 
@@ -98,11 +109,11 @@ const Builder = {
 
       }
 
-    } else if ( _.isFunction ( type ) && 'modelName' in type ) {
+    } else if ( isFunction ( type ) && 'modelName' in type ) {
 
       return Builder._expandType ( Mongease.getSchema ( type.modelName ) );
 
-    } else if ( _.isObject ( type ) && 'childSchemas' in type && 'obj' in type ) { // Is a Mongoose's Schema
+    } else if ( isObject ( type ) && 'childSchemas' in type && 'obj' in type ) { // Is a Mongoose's Schema
 
       return Builder._expandType ( type.obj );
 
@@ -115,10 +126,10 @@ const Builder = {
   _getFields ( type ) {
 
     function nullify ( obj ) {
-      return _.forEach ( obj, ( val, key: string ) => {
-        obj[key] = _.isPlainObject ( val )
+      return forEach ( obj, ( val, key: string ) => {
+        obj[key] = isPlainObject ( val )
                      ? nullify ( val )
-                     : _.isArray ( val ) && val.length && _.isPlainObject ( val[0] )
+                     : isArray ( val ) && val.length && isPlainObject ( val[0] )
                        ? nullify ( val[0] )
                        : '';
       });
