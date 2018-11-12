@@ -145,4 +145,4 @@ const Builder = {
 
 /* EXPORT */
 
-export = Object.assign ( Builder, { default: Builder } );
+export default Builder;
