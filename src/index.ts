@@ -111,7 +111,7 @@ const Builder = {
 
     } else if ( isFunction ( type ) && 'modelName' in type ) {
 
-      return Builder._expandType ( Mongease.getSchema ( type.modelName ) );
+      return Builder._expandType ( Mongease.getSchema ( type['modelName'] ) );
 
     } else if ( isObject ( type ) && 'childSchemas' in type && 'obj' in type ) { // Is a Mongoose's Schema
 

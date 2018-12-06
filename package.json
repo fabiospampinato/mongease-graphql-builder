@@ -1,6 +1,6 @@
 {
   "name": "mongease-graphql-builder",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Module for auto-generating simple GraphQL queries from Mongease descriptions.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
